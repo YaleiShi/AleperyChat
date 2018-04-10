@@ -2,15 +2,16 @@ package com.example.pengfeisong.videochatdemo;
 
 import android.Manifest;
 import android.content.Intent;
-import android.media.MediaCas;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.affectiva.android.affdex.sdk.Frame;
+import com.affectiva.android.affdex.sdk.detector.Detector;
+import com.affectiva.android.affdex.sdk.detector.Face;
+import com.affectiva.android.affdex.sdk.detector.FrameDetector;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Publisher;
 import com.opentok.android.PublisherKit;
@@ -18,16 +19,19 @@ import com.opentok.android.Session;
 import com.opentok.android.Stream;
 import com.opentok.android.Subscriber;
 
+import java.util.List;
+
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements Session.SessionListener, PublisherKit.PublisherListener{
+public class MainActivity extends AppCompatActivity implements Session.SessionListener, PublisherKit.PublisherListener, Detector.ImageListener {
 
     private static String API_KEY="46081352";
     private static String SESSION_ID="1_MX40NjA4MTM1Mn5-MTUyMTI1MDgzMzE1Mn5ONkhxZVEyakc3bDQxTzN2YmRXMENLVUl-fg";
     private static String TOKEN="T1==cGFydG5lcl9pZD00NjA4MTM1MiZzaWc9ZDdmYjJjZDJiYjFmYjZmZWEyZWI5MDg5NTVhZWM2ODRmODk0YTVhNTpzZXNzaW9uX2lkPTFfTVg0ME5qQTRNVE0xTW41LU1UVXlNVEkxTURnek16RTFNbjVPTmtoeFpWRXlha2MzYkRReFR6TjJZbVJYTUVOTFZVbC1mZyZjcmVhdGVfdGltZT0xNTIxMjUwODk2Jm5vbmNlPTAuNDU5Njg1MjI1NzEyNTA2MzYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTUyMzg0Mjg5NSZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==";
     private static String LOG_TAG=MainActivity.class.getSimpleName();
     private static final int RC_SETTINGS = 123;
+
     /** Autentication */
 
 
@@ -35,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
 
     private FrameLayout PublisherContainer;
     private FrameLayout SubscriberContainer;
-
+    FrameDetector frameDetectorPublisher;
+    FrameDetector frameDetectorSubscriber;
     private Publisher publisher;
 
     private Subscriber subscriber;
@@ -49,7 +54,21 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
 
         PublisherContainer = (FrameLayout)findViewById(R.id.publisher_container);
         SubscriberContainer = (FrameLayout)findViewById(R.id.subscriber_container);
-        
+
+        frameDetectorPublisher = new FrameDetector(this);
+        frameDetectorSubscriber = new FrameDetector(this);
+
+        frameDetectorPublisher.setImageListener(this);
+        frameDetectorSubscriber.setImageListener(this);
+
+        frameDetectorPublisher.setDetectAllEmotions(true);
+        frameDetectorPublisher.setDetectAllExpressions(true);
+        frameDetectorSubscriber.setDetectAllEmotions(true);
+        frameDetectorSubscriber.setDetectAllExpressions(true);
+
+//        frameDetectorPublisher.process(null);
+        frameDetectorPublisher.start();
+        frameDetectorSubscriber.start();
     }
 
     @Override
@@ -133,6 +152,11 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
     public void endChat(View view){
         Intent intent = new Intent(this, EndingActivity.class);
         startActivity(intent); /** Starts an instance of EndingActivity specified by the Intent */
+
+    }
+
+    @Override
+    public void onImageResults(List<Face> list, Frame frame, float v) {
 
     }
 }

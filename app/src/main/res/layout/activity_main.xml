@@ -9,22 +9,22 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:id="@+id/subscriber_container"
-            >
-            <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="459dp">
+
+            <SurfaceView
+                android:id="@+id/publisher_container"
                 android:layout_width="90dp"
                 android:layout_height="120dp"
-                android:id="@+id/publisher_container"
                 android:layout_gravity="bottom|end"
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="10dp"
-                android:padding="3dp"
-                >
+                android:padding="3dp">
 
-            </FrameLayout>
+            </SurfaceView>
 
             <Button
                 android:id="@+id/exist"
@@ -36,7 +36,16 @@
                 android:onClick="endChat"
                 android:padding="3dp"
                 android:text="x" />
+
+
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="330dp"
+            android:layout_height="38dp"
+            android:layout_gravity="bottom|start"
+            android:text="TextView" />
 
 
     </FrameLayout>

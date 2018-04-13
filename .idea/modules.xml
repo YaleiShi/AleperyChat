@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AleperyChat.iml" filepath="$PROJECT_DIR$/AleperyChat.iml" />
-      <module fileurl="file://C:\Users\shiya\AndroidStudioProjects\AleperyChat\VideoChatDemo.iml" filepath="C:\Users\shiya\AndroidStudioProjects\AleperyChat\VideoChatDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

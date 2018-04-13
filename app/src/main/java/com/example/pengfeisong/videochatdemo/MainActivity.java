@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.affectiva.android.affdex.sdk.Frame;
+import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
-import com.affectiva.android.affdex.sdk.detector.FrameDetector;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Publisher;
 import com.opentok.android.PublisherKit;
@@ -24,7 +27,7 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements Session.SessionListener, PublisherKit.PublisherListener, Detector.ImageListener {
+public class MainActivity extends AppCompatActivity implements Session.SessionListener, PublisherKit.PublisherListener, Detector.ImageListener, CameraDetector.CameraEventListener {
 
     private static String API_KEY="46081352";
     private static String SESSION_ID="1_MX40NjA4MTM1Mn5-MTUyMTI1MDgzMzE1Mn5ONkhxZVEyakc3bDQxTzN2YmRXMENLVUl-fg";
@@ -37,13 +40,15 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
 
     private Session session;
 
-    private FrameLayout PublisherContainer;
+    TextView tv;
+    private SurfaceView PublisherContainer;
     private FrameLayout SubscriberContainer;
-    FrameDetector frameDetectorPublisher;
-    FrameDetector frameDetectorSubscriber;
+//    FrameDetector frameDetector;
+    CameraDetector cd;
     private Publisher publisher;
 
     private Subscriber subscriber;
+    int maxProcessingRate = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,23 +57,29 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
 
         requestPermission();
 
-        PublisherContainer = (FrameLayout)findViewById(R.id.publisher_container);
+        PublisherContainer = (SurfaceView) findViewById(R.id.publisher_container);
         SubscriberContainer = (FrameLayout)findViewById(R.id.subscriber_container);
 
-        frameDetectorPublisher = new FrameDetector(this);
-        frameDetectorSubscriber = new FrameDetector(this);
+        cd = new CameraDetector(this, CameraDetector.CameraType.CAMERA_FRONT, PublisherContainer);
 
-        frameDetectorPublisher.setImageListener(this);
-        frameDetectorSubscriber.setImageListener(this);
+        cd.setMaxProcessRate(maxProcessingRate);
 
-        frameDetectorPublisher.setDetectAllEmotions(true);
-        frameDetectorPublisher.setDetectAllExpressions(true);
-        frameDetectorSubscriber.setDetectAllEmotions(true);
-        frameDetectorSubscriber.setDetectAllExpressions(true);
+        cd.setImageListener(this);
+//        cd.setOnCameraEventListener(this);
 
-//        frameDetectorPublisher.process(null);
-        frameDetectorPublisher.start();
-        frameDetectorSubscriber.start();
+        cd.setDetectAllEmotions(true);
+        cd.setDetectAllExpressions(true);
+
+        cd.start();
+
+//        frameDetector = new FrameDetector(this);
+//
+//        frameDetector.setImageListener(this);
+//
+//        frameDetector.setDetectAllEmotions(true);
+//        frameDetector.setDetectAllExpressions(true);
+//
+//        frameDetector.start();
     }
 
     @Override
@@ -98,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
         publisher = new Publisher.Builder(this).build();
         publisher.setPublisherListener(this);
 
-        PublisherContainer.addView(publisher.getView());
+//        PublisherContainer.addView(publisher.getView());
         session.publish(publisher);
     }
 
@@ -156,7 +167,38 @@ public class MainActivity extends AppCompatActivity implements Session.SessionLi
     }
 
     @Override
-    public void onImageResults(List<Face> list, Frame frame, float v) {
+    public void onCameraSizeSelected(int cameraHeight, int cameraWidth, Frame.ROTATE rotation) {
 
+        //1
+        ViewGroup.LayoutParams params = PublisherContainer.getLayoutParams();
+
+        //2
+        params.height = cameraHeight;
+        params.width = cameraWidth;
+
+        //3
+        PublisherContainer.setLayoutParams(params);
+    }
+
+    @Override
+    public void onImageResults(List<Face> faces, Frame frame, float v) {
+        //1
+        if (faces == null)
+            return; //frame was not processed
+
+        //2
+        if (faces.size() == 0)
+            return; //no face found
+
+//        tv.setText("There are " + faces.size() + " faces!");
+        //3
+        Face face = faces.get(0);
+//        Face face02 = faces.get(1);
+
+        //4
+//        SynchronySystem ss = new SynchronySystem();
+//        ss.add(face01, face02);
+//        Double synchrony = ss.getSynchrony();
+//        tv.setText("The synchrony is" + synchrony);
     }
 }
